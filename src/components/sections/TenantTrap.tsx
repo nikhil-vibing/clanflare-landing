@@ -5,10 +5,9 @@ import PlatformLogo, {
   platformLabel,
   type Platform,
 } from "@/components/brand/PlatformLogo";
-import { KeyRound } from "lucide-react";
+import { KeyRound, Lock } from "lucide-react";
 import { useRef } from "react";
 import { HumanAvatar } from "@/components/fx/mocks";
-import Reveal from "@/components/fx/Reveal";
 import { copy } from "@/lib/copy";
 import { gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
 
@@ -133,12 +132,13 @@ export default function TenantTrap() {
         }
       );
 
-      // <1024px (phone + tablet) + motion: a LIGHTER, NON-PINNED reveal. The
-      // captive composition (orb + tethered chips + constellation) assembles
-      // as the stage scrolls into view; a gentle scrubbed drift gives the
-      // chips the "pull" of captivity. No pin, transform/opacity only — so the
-      // mobile address-bar resize bug can't apply and it stays cheap on
-      // low-power devices. The 3 beats below reveal in sequence via <Reveal>.
+      // <1024px (phone + tablet) + motion: a LIGHTER, NON-PINNED reveal that
+      // tells the SAME three acts as the desktop pin, each scroll-TRIGGERED on
+      // enter (Apple/Pudding mobile pattern — never pin-scrub, which fights the
+      // address bar). Act 1 the captive constellation assembles; Act 2 the reach
+      // bars crater + members lock out; Act 3 the branded-app payoff snaps in.
+      // No pin, transform/opacity only — so the mobile address-bar resize bug
+      // can't apply and it stays cheap on low-power devices.
       mm.add(
         "(max-width: 1023px) and (prefers-reduced-motion: no-preference)",
         () => {
@@ -189,6 +189,56 @@ export default function TenantTrap() {
               { autoAlpha: 0, scale: 0.4, stagger: 0.07, duration: 0.5, ease: "back.out(1.6)" },
               "<"
             );
+
+          // ACT 2 — the trap springs. The reach bars climb then crater and the
+          // "locked out" chip snaps in as this card scrolls up: the algorithm
+          // burying your reach, made literal.
+          const trap = q<HTMLElement>("[data-m-trap]")[0];
+          if (trap) {
+            const bars = q<HTMLElement>("[data-m-bar]");
+            const lock = q<HTMLElement>("[data-m-lock]");
+            const drop = q<HTMLElement>("[data-m-drop]");
+            gsap
+              .timeline({
+                scrollTrigger: {
+                  trigger: trap,
+                  start: "top 78%",
+                  toggleActions: "play none none reverse",
+                },
+              })
+              .from(bars, {
+                scaleY: 0,
+                transformOrigin: "50% 100%",
+                stagger: 0.06,
+                duration: 0.5,
+                ease: "power2.out",
+              })
+              .from(lock, { autoAlpha: 0, scale: 0.6, y: -6, duration: 0.4, ease: "back.out(1.7)" }, "<+0.25")
+              .from(drop, { autoAlpha: 0, x: -8, duration: 0.4 }, "<");
+          }
+
+          // ACT 3 — you own it. The branded app frame assembles, members pop in,
+          // the key turns, and the payoff stats rise: the resolution the desktop
+          // scene earns, now told on mobile too.
+          const own = q<HTMLElement>("[data-m-own]")[0];
+          if (own) {
+            const frame = q<HTMLElement>("[data-m-own-frame]");
+            const members = q<HTMLElement>("[data-m-own-member]");
+            const key = q<HTMLElement>("[data-m-own-key]");
+            const stats = q<HTMLElement>("[data-m-own-stat]");
+            gsap
+              .timeline({
+                scrollTrigger: {
+                  trigger: own,
+                  start: "top 78%",
+                  toggleActions: "play none none reverse",
+                },
+              })
+              .from(frame, { autoAlpha: 0, scale: 0.86, y: 20, duration: 0.55, ease: "back.out(1.3)" })
+              .from(members, { autoAlpha: 0, scale: 0.4, stagger: 0.06, duration: 0.4, ease: "back.out(1.7)" }, "<+0.2")
+              .from(key, { rotate: -90, autoAlpha: 0, duration: 0.4 }, "<")
+              .from(stats, { autoAlpha: 0, y: 14, stagger: 0.08, duration: 0.4, ease: "power2.out" }, "<+0.1");
+          }
         }
       );
     },
@@ -319,82 +369,194 @@ export default function TenantTrap() {
         </div>
       </div>
 
-      {/* ===== stacked layout (phone / tablet / reduced motion) =====
-          Below 1024px (or with reduced motion) this replaces the pinned scene.
-          With motion, the composition assembles + drifts on scroll via the
-          <1024px gsap.matchMedia block above (non-pinned). Static otherwise. */}
-      <div className="mx-auto max-w-[1180px] px-6 py-20 md:px-10 lg:motion-safe:hidden">
+      {/* ===== stacked 3-act story (phone / tablet / reduced motion) =====
+          Below 1024px (or reduced motion) this replaces the pinned scene. The
+          desktop tells a pinned 3-beat story; on touch we tell the SAME three
+          acts as scroll-TRIGGERED reveals (the Apple/Pudding mobile pattern —
+          reveal-on-enter, never pin-scrub, which fights the address bar). Every
+          beat is PAIRED with its own visual so the message lands instead of
+          three naked paragraphs. The orb/chips carry a CSS -translate fallback
+          so the constellation still centres under reduced motion (no GSAP). */}
+      <div className="mx-auto max-w-[600px] px-6 py-20 md:px-10 lg:motion-safe:hidden">
         <p className="eyebrow">The tenant trap</p>
-        {/* mobile/tablet constellation — a centred captive ring. The tether SVG
-            and the chips share ONE coordinate box (no padding offset between
-            them), every chip is centred on its ring anchor, and the radius
-            keeps them clear of the clipped edge — so the lines always meet the
-            chips and nothing dangles into an empty corner. Square on phones
-            (roomy circle), 5:4 on tablet (a wider oval). */}
-        <div
-          data-m-stage
-          aria-hidden="true"
-          className="relative mt-8 aspect-square overflow-hidden rounded-3xl border border-hairline-2 bg-surface sm:aspect-[5/4]"
-        >
-          <div className="dot-grid absolute inset-0 opacity-70" />
-          {/* tethers: each chip on the ring → "you" at the centre */}
-          <svg
-            className="absolute inset-0 h-full w-full"
-            viewBox="0 0 100 100"
-            preserveAspectRatio="none"
+
+        {/* ---- ACT 1 · captive — you, tethered to six platforms ---- */}
+        <div className="mt-8">
+          <div
+            data-m-stage
+            aria-hidden="true"
+            className="relative aspect-square overflow-hidden rounded-3xl border border-hairline-2 bg-surface sm:aspect-[5/4]"
           >
-            {M_CHIPS.map((c, i) => (
-              <line
-                key={i}
-                data-m-link
-                className="tether-shimmer"
-                style={{ animationDelay: `${i * 0.4}s` }}
-                x1={c.x}
-                y1={c.y}
-                x2={50}
-                y2={50}
-                stroke="rgba(155,230,232,0.34)"
-                strokeWidth="0.4"
-                strokeDasharray="1.4 1.3"
-              />
-            ))}
-          </svg>
-          {/* the creator, dead centre (GSAP centres it via xPercent/yPercent) */}
-          <div data-m-orb className="absolute left-1/2 top-1/2 z-[2]">
-            <div className="orb-pulse glass-device liquid-rim flex h-20 w-20 items-center justify-center rounded-full p-2 shadow-[0_0_38px_rgba(72,166,167,0.4)] sm:h-24 sm:w-24">
-              <HumanAvatar index={2} className="h-full w-full" />
-            </div>
-            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-teal-hi px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#06100F] shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
-              you
-            </span>
-          </div>
-          {/* captor chips — anchored on the ring, each centred on its point */}
-          {PLATFORMS.map((p, i) => (
-            <span
-              key={p}
-              data-m-chip
-              className="absolute z-[3] block"
-              style={{ left: `${M_CHIPS[i].x}%`, top: `${M_CHIPS[i].y}%` }}
+            <div className="dot-grid absolute inset-0 opacity-70" />
+            {/* tethers: each chip on the ring → "you" at the centre */}
+            <svg
+              className="absolute inset-0 h-full w-full"
+              viewBox="0 0 100 100"
+              preserveAspectRatio="none"
             >
-              <span
-                data-m-chip-float
-                className="glass-chip flex h-11 w-11 items-center justify-center shadow-[var(--shadow-raise)]"
-                aria-label={platformLabel(p)}
-              >
-                <PlatformLogo platform={p} className="relative h-5 w-5" />
+              {M_CHIPS.map((c, i) => (
+                <line
+                  key={i}
+                  data-m-link
+                  className="tether-shimmer"
+                  style={{ animationDelay: `${i * 0.4}s` }}
+                  x1={c.x}
+                  y1={c.y}
+                  x2={50}
+                  y2={50}
+                  stroke="rgba(155,230,232,0.34)"
+                  strokeWidth="0.4"
+                  strokeDasharray="1.4 1.3"
+                />
+              ))}
+            </svg>
+            {/* the creator, dead centre */}
+            <div data-m-orb className="absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2">
+              <div className="orb-pulse glass-device liquid-rim flex h-20 w-20 items-center justify-center rounded-full p-2 shadow-[0_0_38px_rgba(72,166,167,0.4)] sm:h-24 sm:w-24">
+                <HumanAvatar index={2} className="h-full w-full" />
+              </div>
+              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-teal-hi px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#06100F] shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
+                you
               </span>
-            </span>
-          ))}
+            </div>
+            {/* captor chips — anchored on the ring, each centred on its point */}
+            {PLATFORMS.map((p, i) => (
+              <span
+                key={p}
+                data-m-chip
+                className="absolute z-[3] block -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${M_CHIPS[i].x}%`, top: `${M_CHIPS[i].y}%` }}
+              >
+                <span
+                  data-m-chip-float
+                  className="glass-chip flex h-11 w-11 items-center justify-center shadow-[var(--shadow-raise)]"
+                  aria-label={platformLabel(p)}
+                >
+                  <PlatformLogo platform={p} className="relative h-5 w-5" />
+                </span>
+              </span>
+            ))}
+          </div>
+          <div className="mt-7">
+            <p className="text-[clamp(25px,6.2vw,33px)] font-bold leading-[1.16] tracking-tight">
+              {beats[0].line}
+            </p>
+            <p className="mt-3 text-[17px] font-medium leading-relaxed text-ink-dim">{beats[0].sub}</p>
+          </div>
         </div>
-        <div className="mt-6 flex flex-col gap-12">
-          {beats.map((b, i) => (
-            <Reveal key={i} delay={i * 0.05}>
-              <p className="text-[clamp(26px,6vw,38px)] font-bold leading-[1.15] tracking-tight">
-                {b.line}
+
+        {/* ---- ACT 2 · the trap springs — reach craters, members locked ---- */}
+        <div className="mt-16">
+          <div
+            data-m-trap
+            aria-hidden="true"
+            className="relative overflow-hidden rounded-3xl border border-hairline-2 bg-surface p-6"
+          >
+            <div className="dot-grid absolute inset-0 opacity-50" />
+            <div className="relative flex items-center justify-between gap-3">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-ink-faint">
+                Your reach
               </p>
-              <p className="mt-3 max-w-[38ch] text-[17px] font-medium text-ink-dim">{b.sub}</p>
-            </Reveal>
-          ))}
+              <span
+                data-m-lock
+                className="glass-chip flex items-center gap-1.5 whitespace-nowrap px-2.5 py-1 text-[11px] font-semibold"
+                style={{ color: "#F0A8A2" }}
+              >
+                <Lock size={12} />
+                members locked out
+              </span>
+            </div>
+            <div className="relative mt-5 flex h-28 items-end gap-1.5">
+              {[88, 96, 74, 80, 46, 27, 15, 9].map((h, i) => (
+                <span
+                  key={i}
+                  data-m-bar
+                  className="flex-1 rounded-t-[3px]"
+                  style={{
+                    height: `${h}%`,
+                    background:
+                      i >= 4
+                        ? "linear-gradient(to top, rgba(214,90,80,0.22), rgba(240,130,120,0.82))"
+                        : "linear-gradient(to top, rgba(72,166,167,0.22), rgba(95,201,202,0.78))",
+                  }}
+                />
+              ))}
+            </div>
+            <div className="relative mt-3 flex items-center justify-between text-[12px]">
+              <span className="text-ink-faint">12 months on rented land</span>
+              <span data-m-drop className="font-bold" style={{ color: "#F0A8A2" }}>
+                −91% reach
+              </span>
+            </div>
+          </div>
+          <div className="mt-7">
+            <p className="text-[clamp(25px,6.2vw,33px)] font-bold leading-[1.16] tracking-tight">
+              {beats[1].line}
+            </p>
+            <p className="mt-3 text-[17px] font-medium leading-relaxed text-ink-dim">{beats[1].sub}</p>
+          </div>
+        </div>
+
+        {/* ---- ACT 3 · you own it — branded app + the payoff ---- */}
+        <div className="mt-16">
+          <div
+            data-m-own
+            aria-hidden="true"
+            className="relative overflow-hidden rounded-3xl border border-teal-hi/20 bg-surface p-5 shadow-[0_30px_70px_-40px_rgba(72,166,167,0.5)]"
+          >
+            <div className="dot-grid absolute inset-0 opacity-40" />
+            {/* branded app frame */}
+            <div data-m-own-frame className="glass-device relative rounded-2xl">
+              <div className="flex items-center gap-2.5 border-b border-white/5 px-4 py-3">
+                <span className="h-7 w-7 rounded-lg bg-gradient-to-br from-teal-hi to-teal shadow-[0_0_14px_rgba(72,166,167,0.5)]" />
+                <div className="leading-none">
+                  <p className="text-[12px] font-black tracking-tight text-ink">Yourbrand</p>
+                  <p className="mt-1 text-[9px] font-medium uppercase tracking-wider text-ink-faint">
+                    community
+                  </p>
+                </div>
+                <span
+                  data-m-own-key
+                  className="glass-chip ml-auto flex h-8 w-8 items-center justify-center text-teal-hi"
+                >
+                  <KeyRound size={15} />
+                </span>
+              </div>
+              <div className="flex items-center px-4 py-3.5">
+                <div className="flex -space-x-2.5">
+                  {[0, 1, 3, 4, 5].map((idx, i) => (
+                    <span key={i} data-m-own-member>
+                      <HumanAvatar index={idx} className="h-8 w-8 ring-2 ring-[#0c0e0d]" />
+                    </span>
+                  ))}
+                </div>
+                <span className="ml-3 text-[12.5px] font-semibold text-ink-dim">
+                  12.4k members · yours
+                </span>
+              </div>
+            </div>
+            {/* the payoff — the credibility stats the desktop scene earns */}
+            <div className="relative mt-4 space-y-2">
+              {copy.credibility.proof.map((s) => (
+                <div
+                  key={s.l}
+                  data-m-own-stat
+                  className="raised flex items-center justify-between gap-3 rounded-xl px-4 py-2.5"
+                >
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-ink-faint">
+                    {s.l}
+                  </span>
+                  <span className="text-[14.5px] font-black tracking-tight text-teal-hi">{s.v}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="mt-7">
+            <p className="text-[clamp(25px,6.2vw,33px)] font-bold leading-[1.16] tracking-tight">
+              {beats[2].line}
+            </p>
+            <p className="mt-3 text-[17px] font-medium leading-relaxed text-ink-dim">{beats[2].sub}</p>
+          </div>
         </div>
       </div>
     </section>
