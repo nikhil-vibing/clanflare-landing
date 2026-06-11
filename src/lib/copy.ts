@@ -87,8 +87,8 @@ export const copy = {
       {
         n: "③",
         title: "Own",
-        body: "The whole point. Your members, your data, your reach — and the revenue, yours to keep. No algorithm in the middle, no platform taking a cut.",
-        rev: "the revenue, yours to keep.",
+        body: "The whole point. Your members, your data, your reach — and the revenue, paid into your account, not held by a platform. Secured, portable, and yours to keep. No algorithm in the middle, no cut taken, no lock-in.",
+        rev: "the revenue, paid into your account,",
       },
     ],
   },
@@ -116,7 +116,7 @@ export const copy = {
       {
         key: "membership",
         title: "Membership & billing",
-        body: "Tiers, recurring payments, and invoices — revenue that lands in your account, not a platform's.",
+        body: "Tiers, subscriptions, and one-off sales — cards and UPI in, paid straight out to your account. No platform cut, no payout you wait weeks for.",
       },
       {
         key: "streak",
@@ -222,7 +222,7 @@ export const copy = {
   contact: {
     eyebrow: "Get in touch",
     heading: "Your clan. Your world. Your app.",
-    sub: "Tell us who you're building for. Real humans reply within a day — no bots, no pressure.",
+    sub: "Tell us who you're building for. A 15-minute call, no commitment — and if you ever leave, the app, the data and the audience leave with you. No lock-in.",
     email: "hello@clanflare.com",
     fields: {
       name: { label: "Name", placeholder: "Your name" },
