@@ -22,6 +22,21 @@ const CHIPS = [
   { left: "0%", top: "42%", rotate: "3deg", x: 8, y: 46 },
 ];
 
+// Mobile/tablet ring: the desktop CHIPS layout was tuned for a wide stage and
+// falls apart on a narrow one (chips clip at the edge, tethers miss them). Here
+// the 6 captors sit on a symmetric ring around "you" (center 50,50). Each point
+// is BOTH the chip's centre and the tether endpoint, so a line can never dangle
+// to an empty corner. Radius kept at 32% so chips never reach the clipped edge,
+// and the bottom-centre gap (no chip at 90°) leaves room for the "you" badge.
+const M_CHIPS = [
+  { x: 66, y: 22 }, // youtube  — upper right
+  { x: 82, y: 50 }, // instagram — right
+  { x: 66, y: 78 }, // discord  — lower right
+  { x: 34, y: 78 }, // patreon  — lower left
+  { x: 18, y: 50 }, // tiktok   — left
+  { x: 34, y: 22 }, // x        — upper left
+];
+
 const PLATFORMS: Platform[] = PLATFORM_ORDER;
 
 /**
@@ -132,41 +147,48 @@ export default function TenantTrap() {
           if (!stage) return;
           const orb = q<HTMLElement>("[data-m-orb]");
           const chips = q<HTMLElement>("[data-m-chip]");
+          const chipFloats = q<HTMLElement>("[data-m-chip-float]");
           const links = q<SVGLineElement>("[data-m-link]");
 
-          // assemble-in when the stage enters the viewport
+          // Centre the orb + chips on their anchor points via GSAP transforms,
+          // NOT a Tailwind translate — the assemble/idle tweens write to
+          // transform and would otherwise clobber a utility translate and shove
+          // every node off its anchor (which is exactly what broke the mobile
+          // render: chips landed at the edge and clipped).
+          gsap.set(orb, { xPercent: -50, yPercent: -50 });
+          gsap.set(chips, { xPercent: -50, yPercent: -50 });
+
+          // idle float on the chip INNERS so the captive ring breathes — a
+          // separate element from the assemble target (mirrors the desktop
+          // scene) so the two tweens never fight over the same transform.
+          chipFloats.forEach((el, i) => {
+            gsap.to(el, {
+              y: -5,
+              duration: 2.6 + (i % 3) * 0.4,
+              yoyo: true,
+              repeat: -1,
+              ease: "sine.inOut",
+              delay: i * 0.3,
+            });
+          });
+
+          // assemble-in as the stage scrolls into view: orb pops, tethers draw,
+          // then the platform chips snap onto the ring. Reverses on scroll-up.
           gsap
             .timeline({
               scrollTrigger: {
                 trigger: stage,
-                start: "top 82%",
+                start: "top 80%",
                 toggleActions: "play none none reverse",
               },
             })
-            .from(orb, { autoAlpha: 0, scale: 0.55, duration: 0.5, ease: "back.out(1.6)" })
-            .from(
-              links,
-              { autoAlpha: 0, duration: 0.4, stagger: 0.05 },
-              "<+0.1"
-            )
+            .from(orb, { autoAlpha: 0, scale: 0.5, duration: 0.5, ease: "back.out(1.6)" })
+            .from(links, { autoAlpha: 0, duration: 0.4, stagger: 0.06 }, "<+0.1")
             .from(
               chips,
-              { autoAlpha: 0, scale: 0.5, stagger: 0.07, duration: 0.5, ease: "back.out(1.5)" },
+              { autoAlpha: 0, scale: 0.4, stagger: 0.07, duration: 0.5, ease: "back.out(1.6)" },
               "<"
             );
-
-          // gentle scroll-scrubbed drift — the chips strain outward as you pass
-          gsap.to(chips, {
-            y: (i: number) => (i % 2 ? 16 : -12),
-            x: (i: number) => (i < 3 ? 12 : -12),
-            ease: "none",
-            scrollTrigger: {
-              trigger: stage,
-              start: "top 65%",
-              end: "bottom 25%",
-              scrub: true,
-            },
-          });
         }
       );
     },
@@ -303,19 +325,25 @@ export default function TenantTrap() {
           <1024px gsap.matchMedia block above (non-pinned). Static otherwise. */}
       <div className="mx-auto max-w-[1180px] px-6 py-20 md:px-10 lg:motion-safe:hidden">
         <p className="eyebrow">The tenant trap</p>
+        {/* mobile/tablet constellation — a centred captive ring. The tether SVG
+            and the chips share ONE coordinate box (no padding offset between
+            them), every chip is centred on its ring anchor, and the radius
+            keeps them clear of the clipped edge — so the lines always meet the
+            chips and nothing dangles into an empty corner. Square on phones
+            (roomy circle), 5:4 on tablet (a wider oval). */}
         <div
           data-m-stage
-          className="relative mt-8 aspect-[5/4] overflow-hidden rounded-3xl border border-hairline-2 bg-surface p-6"
+          aria-hidden="true"
+          className="relative mt-8 aspect-square overflow-hidden rounded-3xl border border-hairline-2 bg-surface sm:aspect-[5/4]"
         >
           <div className="dot-grid absolute inset-0 opacity-70" />
-          {/* constellation: chips tethered to "you" (same system as desktop) */}
+          {/* tethers: each chip on the ring → "you" at the centre */}
           <svg
             className="absolute inset-0 h-full w-full"
             viewBox="0 0 100 100"
             preserveAspectRatio="none"
-            aria-hidden="true"
           >
-            {CHIPS.map((c, i) => (
+            {M_CHIPS.map((c, i) => (
               <line
                 key={i}
                 data-m-link
@@ -331,28 +359,32 @@ export default function TenantTrap() {
               />
             ))}
           </svg>
-          <div className="relative flex h-full items-center justify-center">
-            <div data-m-orb className="relative z-[2]">
-              <div className="orb-pulse glass-device liquid-rim flex h-24 w-24 items-center justify-center rounded-full p-2">
-                <HumanAvatar index={2} className="h-full w-full" />
-              </div>
-              <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-teal-hi px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#06100F] shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
-                you
-              </span>
+          {/* the creator, dead centre (GSAP centres it via xPercent/yPercent) */}
+          <div data-m-orb className="absolute left-1/2 top-1/2 z-[2]">
+            <div className="orb-pulse glass-device liquid-rim flex h-20 w-20 items-center justify-center rounded-full p-2 shadow-[0_0_38px_rgba(72,166,167,0.4)] sm:h-24 sm:w-24">
+              <HumanAvatar index={2} className="h-full w-full" />
             </div>
-            <div className="absolute inset-0">
-              {PLATFORMS.map((p, i) => (
-                <span
-                  key={p}
-                  data-m-chip
-                  className="glass-chip absolute flex h-11 w-11 items-center justify-center"
-                  style={{ left: CHIPS[i].left, top: CHIPS[i].top }}
-                >
-                  <PlatformLogo platform={p} className="relative h-5 w-5" />
-                </span>
-              ))}
-            </div>
+            <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-teal-hi px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-[#06100F] shadow-[0_4px_14px_rgba(0,0,0,0.45)]">
+              you
+            </span>
           </div>
+          {/* captor chips — anchored on the ring, each centred on its point */}
+          {PLATFORMS.map((p, i) => (
+            <span
+              key={p}
+              data-m-chip
+              className="absolute z-[3] block"
+              style={{ left: `${M_CHIPS[i].x}%`, top: `${M_CHIPS[i].y}%` }}
+            >
+              <span
+                data-m-chip-float
+                className="glass-chip flex h-11 w-11 items-center justify-center shadow-[var(--shadow-raise)]"
+                aria-label={platformLabel(p)}
+              >
+                <PlatformLogo platform={p} className="relative h-5 w-5" />
+              </span>
+            </span>
+          ))}
         </div>
         <div className="mt-6 flex flex-col gap-12">
           {beats.map((b, i) => (
