@@ -1,0 +1,727 @@
+@import "tailwindcss";
+
+@theme {
+  /* Elevation ladder — the z-axis that kills flatness (v10 Rule 1) */
+  --color-base: #0c0e0d; /* page background */
+  --color-surface: #121514; /* section bands */
+  --color-card: #1a1e1c; /* cards */
+  --color-card-hover: #222825; /* raised/hover */
+  --color-ink: #f4f5f4; /* primary text */
+  --color-ink-dim: #aab3af; /* secondary text — bumped for contrast (v12 P2-13) */
+  --color-ink-faint: #6b746e;
+  --color-hairline: rgba(255, 255, 255, 0.08);
+  --color-hairline-2: rgba(255, 255, 255, 0.13);
+  --color-teal: #48a6a7; /* THE accent — CTA + 3 dopamine moments only */
+  --color-teal-hi: #5fc9ca;
+  --color-teal-glow: rgba(72, 166, 167, 0.16);
+
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+
+  --shadow-raise: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-raise-lg: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 18px 50px -18px rgba(0, 0, 0, 0.65);
+  --shadow-stage: inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 40px 110px -30px rgba(0, 0, 0, 0.7);
+
+  --animate-floaty: floaty 6s ease-in-out infinite;
+  --animate-breathe: breathe 2.6s ease-in-out infinite;
+  --animate-holo: holo 9s linear infinite;
+  --animate-eq: eq 1s ease-in-out infinite;
+
+  @keyframes floaty {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes breathe {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.35;
+    }
+  }
+  @keyframes holo {
+    0% {
+      background-position: 120% 0;
+    }
+    100% {
+      background-position: -120% 0;
+    }
+  }
+  @keyframes eq {
+    0%,
+    100% {
+      height: 25%;
+    }
+    50% {
+      height: 100%;
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-base);
+  color: var(--color-ink);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-teal);
+  color: #06100f;
+}
+
+/* Type scale (v11 §1 · tracking tightened per v12 P2-13) */
+.text-hero {
+  font-size: clamp(2.75rem, 8vw, 6.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  text-wrap: balance;
+}
+.text-section {
+  font-size: clamp(2rem, 4.5vw, 3.5rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+.eyebrow {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-teal);
+}
+
+/* Raised surface (v11 global rule): one step lighter + soft shadow + top-edge highlight */
+.raised {
+  background: var(--color-card);
+  border: 1px solid var(--color-hairline);
+  border-top-color: rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-raise);
+  border-radius: 16px;
+}
+
+/* v13 liquid-glass material: CSS-only, no WebGL/canvas. */
+.glass-panel,
+.glass-device,
+.glass-chip {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.105), rgba(255, 255, 255, 0.035) 38%, rgba(72, 166, 167, 0.07)),
+    rgba(14, 18, 17, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-top-color: rgba(255, 255, 255, 0.24);
+  border-left-color: rgba(255, 255, 255, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.34),
+    0 24px 70px -34px rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(18px) saturate(1.25);
+  -webkit-backdrop-filter: blur(18px) saturate(1.25);
+}
+.glass-device {
+  border-radius: 24px;
+}
+.glass-panel {
+  border-radius: 18px;
+}
+.glass-chip {
+  border-radius: 999px;
+}
+.glass-panel::before,
+.glass-device::before,
+.glass-chip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 8%, rgba(255, 255, 255, 0.18) 17%, transparent 31%),
+    radial-gradient(65% 70% at 18% 0%, rgba(255, 255, 255, 0.12), transparent 68%);
+  opacity: 0.72;
+}
+.glass-panel::after,
+.glass-device::after,
+.glass-chip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(95, 201, 202, 0.08);
+}
+.glass-sheen {
+  position: relative;
+}
+.glass-sheen::before {
+  transform: translateX(-18%);
+  transition: transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.35s;
+}
+.glass-sheen:hover::before,
+.glass-sheen:focus-visible::before,
+.group:hover .glass-sheen::before,
+.group:focus-visible .glass-sheen::before {
+  transform: translateX(18%);
+  opacity: 0.95;
+}
+.liquid-rim {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -12px 30px rgba(0, 0, 0, 0.22),
+    0 18px 55px -28px rgba(95, 201, 202, 0.28);
+}
+
+/* Teal CTA — dark text on teal fill, never small teal text on dark */
+.btn-teal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 28px;
+  background: var(--color-teal);
+  color: #06100f;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 10px 30px -12px rgba(72, 166, 167, 0.6);
+  transition: background 0.2s, transform 0.2s, box-shadow 0.25s;
+}
+.btn-teal:hover {
+  background: var(--color-teal-hi);
+  transform: translateY(-2px);
+}
+.btn-teal:active {
+  transform: translateY(0) scale(0.98);
+}
+.btn-teal:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  transform: none;
+}
+/* slow sheen sweep every ~8s — attention without nagging (v12 P2-12) */
+.btn-sheen {
+  position: relative;
+  overflow: hidden;
+}
+.btn-sheen::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 65%
+  );
+  transform: translateX(-120%);
+  animation: sheen 8s ease-in-out infinite;
+}
+@keyframes sheen {
+  0%,
+  88% {
+    transform: translateX(-120%);
+  }
+  96%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+/* arrow nudges right on hover */
+.btn-teal .arrow {
+  transition: transform 0.2s ease-out;
+}
+.btn-teal:hover .arrow {
+  transform: translateX(3px);
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  height: 52px;
+  padding: 0 28px;
+  background: transparent;
+  color: var(--color-ink);
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  border: 0;
+  border-radius: 11px;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px var(--color-hairline-2);
+  transition: box-shadow 0.2s, color 0.2s, background 0.2s, transform 0.2s;
+}
+.btn-ghost:hover {
+  box-shadow: inset 0 0 0 1px var(--color-teal);
+  color: var(--color-teal-hi);
+  background: rgba(72, 166, 167, 0.07);
+  transform: translateY(-2px);
+}
+
+/* Visible focus ring on every interactive element (WCAG 2.2 AA) */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: 16px;
+  top: -48px;
+  z-index: 300;
+  background: var(--color-teal);
+  color: #06100f;
+  font-weight: 600;
+  padding: 10px 18px;
+  border-radius: 0 0 10px 10px;
+  transition: top 0.2s;
+}
+.skip-link:focus {
+  top: 0;
+}
+
+/* Hand-drawn squiggle underline — draws via stroke-dashoffset when .draw lands */
+.squiggle {
+  position: relative;
+  white-space: nowrap;
+}
+.squiggle svg {
+  position: absolute;
+  left: -2%;
+  width: 104%;
+  height: 0.5em;
+  bottom: -0.18em;
+  overflow: visible;
+  pointer-events: none;
+}
+.squiggle svg path {
+  fill: none;
+  stroke: var(--color-teal-hi);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 600;
+  stroke-dashoffset: 600;
+}
+.squiggle.draw svg path {
+  animation: squiggle-draw 1s 0.3s cubic-bezier(0.5, 0, 0.2, 1) forwards;
+}
+@keyframes squiggle-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* "renting" strikethrough — drawn via scaleX after the headline settles */
+.strike {
+  position: relative;
+}
+.strike::after {
+  content: "";
+  position: absolute;
+  left: -2%;
+  right: -2%;
+  top: 54%;
+  height: 0.07em;
+  background: var(--color-ink-dim);
+  border-radius: 99px;
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+.strike.struck::after {
+  animation: strike-draw 0.5s 0.15s cubic-bezier(0.6, 0, 0.2, 1) forwards;
+}
+@keyframes strike-draw {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Nav link underline — grows from the left on hover (v12 P2-12) */
+.nav-link {
+  position: relative;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -5px;
+  height: 1.5px;
+  background: var(--color-teal-hi);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.22s ease-out;
+}
+.nav-link:hover::after,
+.nav-link:focus-visible::after {
+  transform: scaleX(1);
+}
+
+/* "you" orb pulse — the emotional center breathes (v12 P2-12) */
+.orb-pulse {
+  animation: orb 3s ease-in-out infinite;
+}
+@keyframes orb {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* Dotted-grid backdrop for the pinned scene (v12 P1-7) */
+.dot-grid {
+  background-image: radial-gradient(rgba(244, 245, 244, 0.07) 1px, transparent 1px);
+  background-size: 28px 28px;
+  -webkit-mask-image: radial-gradient(70% 70% at 50% 50%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(70% 70% at 50% 50%, #000 30%, transparent 100%);
+}
+
+/* Section band transitions — hairline + breathing gradient, no hard cuts (v12 P2-14) */
+.band {
+  position: relative;
+  border-top: 1px solid var(--color-hairline);
+}
+.band::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 24px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), transparent);
+}
+
+/* Per-section glow anchor — faint identity light (v12 P1-6) */
+.glow-anchor {
+  position: relative;
+}
+.glow-anchor::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    50% 38% at var(--glow-x, 50%) 0%,
+    rgba(72, 166, 167, 0.06),
+    transparent 70%
+  );
+}
+
+/* Stats band holographic sheen */
+.holo-band {
+  position: relative;
+  overflow: hidden;
+}
+.holo-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(120, 180, 200, 0.1) 22%,
+    rgba(190, 170, 220, 0.1) 38%,
+    rgba(140, 200, 190, 0.1) 52%,
+    transparent 74%
+  );
+  background-size: 240% 100%;
+  animation: var(--animate-holo);
+}
+
+/* Success check draw-in (v12 P2-12) */
+.check-draw path {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: check 0.6s 0.15s ease-out forwards;
+}
+@keyframes check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ============================================================
+   v14 — living micro-interactions (one per graphic)
+   Every loop is transform/opacity/filter only (compositor-thread)
+   and is auto-disabled by the reduced-motion block below.
+   ============================================================ */
+
+/* Card-scoped pointer spotlight. --mx/--my are set on the card itself
+   by TiltSpotlight (never inherited → no tree-wide style recalc). */
+.spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 1;
+  opacity: var(--spot-op, 0);
+  background: radial-gradient(
+    220px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(95, 201, 202, 0.16),
+    transparent 62%
+  );
+  transition: opacity 0.35s ease;
+}
+
+/* 3D tilt scaffold — perspective lives on the wrapper, transform on inner. */
+.tilt-scene {
+  perspective: 900px;
+}
+.tilt-inner {
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+/* "Live" pulse-dot — meaningful: the room is live. */
+.live-dot {
+  position: relative;
+}
+.live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: live-ping 2.4s ease-out infinite;
+}
+@keyframes live-ping {
+  0% {
+    box-shadow: 0 0 0 0 rgba(95, 201, 202, 0.5);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px rgba(95, 201, 202, 0);
+  }
+}
+
+/* Waveform equaliser — bars breathe via scaleY (compositor). */
+.eq-bar {
+  transform-origin: bottom;
+  animation: eq-pulse 1.5s ease-in-out infinite;
+}
+@keyframes eq-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.5);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* Looping in-product notification: slides in, holds, slides out. */
+.notif-loop {
+  animation: notif-cycle 7.5s ease-in-out infinite;
+}
+@keyframes notif-cycle {
+  0%,
+  6% {
+    transform: translateY(-130%);
+    opacity: 0;
+  }
+  14%,
+  58% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  68%,
+  100% {
+    transform: translateY(-130%);
+    opacity: 0;
+  }
+}
+
+/* Play button breathes. */
+.play-pulse {
+  animation: play-pulse 2.8s ease-in-out infinite;
+}
+@keyframes play-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
+}
+
+/* Active nav dot glow. */
+.nav-dot {
+  animation: nav-dot 2.6s ease-in-out infinite;
+}
+@keyframes nav-dot {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(95, 201, 202, 0);
+  }
+  50% {
+    box-shadow: 0 0 10px 1px rgba(95, 201, 202, 0.65);
+  }
+}
+
+/* Scroll-driven meter / ring fill (compositor-thread, no JS).
+   Falls back to the filled state where view() timelines are unsupported. */
+.meter-fill {
+  transform-origin: left center;
+  animation: meter-fill linear both;
+  animation-timeline: view();
+  animation-range: entry 8% cover 38%;
+}
+@keyframes meter-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+.ring-fill {
+  animation: ring-fill linear both;
+  animation-timeline: view();
+  animation-range: entry 6% cover 42%;
+}
+@keyframes ring-fill {
+  from {
+    clip-path: inset(100% 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+.bar-rise {
+  transform-origin: bottom;
+  animation: bar-rise linear both;
+  animation-timeline: view();
+  animation-range: entry 6% cover 40%;
+}
+@keyframes bar-rise {
+  from {
+    transform: scaleY(0.16);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* One-pass gradient sweep on hover (membership chip / CTA). */
+.sweep {
+  position: relative;
+  overflow: hidden;
+}
+.sweep::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.28) 50%,
+    transparent 62%
+  );
+  transform: translateX(-130%);
+}
+.group:hover .sweep::after,
+.group:focus-visible .sweep::after,
+.sweep:hover::after {
+  animation: sweep-move 0.9s ease-out;
+}
+@keyframes sweep-move {
+  to {
+    transform: translateX(130%);
+  }
+}
+
+/* Tether shimmer for the tenant-trap constellation lines (pre-scroll life).
+   Animates stroke-opacity ONLY — the GSAP scrub owns `opacity`/`autoAlpha` on
+   these same [data-link] nodes, so the two multiply instead of fighting. */
+.tether-shimmer {
+  animation: tether-shimmer 3.2s ease-in-out infinite;
+}
+@keyframes tether-shimmer {
+  0%,
+  100% {
+    stroke-opacity: 0.55;
+  }
+  50% {
+    stroke-opacity: 1;
+  }
+}
+
+/* Magnetic element — JS writes the transform; this just hints the compositor. */
+.magnetic {
+  will-change: transform;
+}
+
+/* Touch / no-fine-pointer: never strand a pointer-only effect. */
+@media (hover: none), (pointer: coarse) {
+  .spotlight::after {
+    opacity: 0 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  .squiggle svg path {
+    stroke-dashoffset: 0;
+  }
+  .strike::after {
+    transform: scaleX(1);
+  }
+  /* show fills complete, never stranded at their start frame */
+  .meter-fill {
+    transform: scaleX(1) !important;
+    animation: none !important;
+  }
+  .ring-fill {
+    clip-path: none !important;
+    animation: none !important;
+  }
+  .bar-rise {
+    transform: scaleY(1) !important;
+    animation: none !important;
+  }
+  .spotlight::after {
+    opacity: 0 !important;
+  }
+}
