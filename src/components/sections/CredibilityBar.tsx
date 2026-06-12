@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import PlatformLogo, {
   PLATFORM_ORDER,
   platformLabel,
@@ -22,35 +23,47 @@ export default function CredibilityBar() {
             {c.label}
           </span>
           <ul className="flex flex-nowrap items-center gap-1.5" aria-label="Platforms you can import from">
-            {PLATFORM_ORDER.map((p) => (
-              <li
-                key={p}
-                className="glass-chip flex h-7 w-7 items-center justify-center text-white/90 transition-transform duration-200 hover:-translate-y-0.5"
-              >
-                <PlatformLogo platform={p} title={platformLabel(p)} className="relative h-3 w-3" />
-              </li>
-            ))}
+            {PLATFORM_ORDER.map((p) => {
+              // TikTok + X are white-on-transparent marks → invisible on the
+              // light chip. Render those two dark; keep the rest full-colour.
+              const mono = p === "tiktok" || p === "x";
+              return (
+                <li
+                  key={p}
+                  className="glass-chip flex h-7 w-7 items-center justify-center text-ink transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  <PlatformLogo
+                    platform={p}
+                    title={platformLabel(p)}
+                    monochrome={mono}
+                    className="relative h-3 w-3"
+                  />
+                </li>
+              );
+            })}
           </ul>
         </div>
 
         <div className="hidden h-9 w-px shrink-0 bg-hairline-2 sm:block" aria-hidden="true" />
 
         {/* right cluster — three real proof points, one row, hairline-separated */}
+        {/* a11y: a <dl> may only directly contain dt/dd or <div> groups — so the
+            separators are <div>s and each metric is one <div> wrapping dt+dd. */}
         <dl className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 sm:flex-nowrap sm:gap-x-5">
           {c.proof.map((m, i) => (
-            <div key={m.l} className="flex items-center gap-x-4 sm:gap-x-5">
+            <Fragment key={m.l}>
               {i > 0 && (
-                <span className="hidden h-7 w-px shrink-0 bg-hairline-2 sm:block" aria-hidden="true" />
+                <div className="hidden h-7 w-px shrink-0 bg-hairline-2 sm:block" aria-hidden="true" />
               )}
               <div className="text-center">
-                <dt className="whitespace-nowrap text-[14px] font-black leading-none tracking-tight text-teal-hi">
+                <dt className="whitespace-nowrap text-[14px] font-black leading-none tracking-normal text-teal-hi">
                   {m.v}
                 </dt>
                 <dd className="mt-1 whitespace-nowrap text-[10px] font-semibold uppercase tracking-wider text-ink-faint">
                   {m.l}
                 </dd>
               </div>
-            </div>
+            </Fragment>
           ))}
         </dl>
       </div>

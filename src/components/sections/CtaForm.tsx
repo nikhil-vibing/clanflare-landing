@@ -1,8 +1,9 @@
 "use client";
 
 import { ArrowRight } from "lucide-react";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { submitContact, type ContactState } from "@/app/actions";
+import MaskReveal from "@/components/fx/MaskReveal";
 import Reveal from "@/components/fx/Reveal";
 import { copy } from "@/lib/copy";
 
@@ -20,15 +21,28 @@ function FieldError({ msg }: { msg?: string }) {
   return <p className="mt-1.5 text-[13px] text-[#e08f8f]">{msg}</p>;
 }
 
+// One-tap intent chips (behavioral audit P0): turns "write me a pitch" into
+// "tap who you are." Picking a chip alone satisfies the required `about` field.
+const KINDS = [
+  "Coaching cohort",
+  "Brand community",
+  "Course / education",
+  "Membership / paid group",
+  "Something else",
+];
+
 export default function CtaForm() {
   const [state, action, pending] = useActionState(submitContact, initial);
+  const [kind, setKind] = useState("");
+  const [detail, setDetail] = useState("");
+  const about = [kind, detail.trim()].filter(Boolean).join(" — ");
   const c = copy.contact;
 
   return (
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="band glow-anchor py-28 md:py-[130px] [--glow-x:70%]"
+      className="anchor-band band glow-anchor py-28 md:py-[130px] [--glow-x:70%]"
     >
       <div className="relative mx-auto max-w-[1180px] px-6 md:px-10">
         <div className="grid items-start gap-12 md:grid-cols-[1.1fr_1fr] md:gap-20">
@@ -36,14 +50,13 @@ export default function CtaForm() {
             <Reveal as="p" className="eyebrow">
               {c.eyebrow}
             </Reveal>
-            <Reveal delay={0.08}>
-              <h2
-                id="contact-heading"
-                className="mt-4 max-w-[14ch] text-[clamp(36px,5vw,62px)] font-extrabold leading-[1.02] tracking-[-0.03em]"
-              >
-                {c.heading}
-              </h2>
-            </Reveal>
+            <MaskReveal
+              as="h2"
+              id="contact-heading"
+              className="mt-4 max-w-[14ch] text-[clamp(36px,5vw,62px)] font-extrabold leading-[1.02] tracking-[-0.03em]"
+            >
+              {c.heading}
+            </MaskReveal>
             <Reveal as="p" delay={0.16} className="mt-5 max-w-[40ch] text-lg leading-relaxed text-ink-dim">
               {c.sub}
             </Reveal>
@@ -57,7 +70,10 @@ export default function CtaForm() {
 
           <Reveal delay={0.08}>
             {state.status === "success" ? (
-              <div className="raised flex min-h-[420px] flex-col items-center justify-center p-10 text-center shadow-[var(--shadow-stage)]">
+              <div
+                style={{ background: "#fbfaf7" }}
+                className="light-island raised flex min-h-[420px] flex-col items-center justify-center p-10 text-center shadow-[var(--shadow-stage)]"
+              >
                 <span className="flex h-16 w-16 items-center justify-center rounded-full bg-teal shadow-[0_0_30px_rgba(72,166,167,0.45)]">
                   <svg
                     className="check-draw"
@@ -77,7 +93,12 @@ export default function CtaForm() {
                 <p className="mt-6 text-xl font-semibold">{c.success}</p>
               </div>
             ) : (
-              <form action={action} className="raised p-9 shadow-[var(--shadow-stage)]" noValidate>
+              <form
+                action={action}
+                style={{ background: "#fbfaf7" }}
+                className="light-island raised p-9 shadow-[var(--shadow-stage)]"
+                noValidate
+              >
                 {/* honeypot — hidden from humans, irresistible to bots */}
                 <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
                   <label htmlFor="f-company">Company</label>
@@ -116,21 +137,38 @@ export default function CtaForm() {
                   </label>
                   <FieldError msg={state.fieldErrors?.email} />
                 </div>
-                <div className="relative mb-6">
+                <fieldset className="mb-6">
+                  <legend className="mb-2.5 text-[13px] font-semibold text-ink">
+                    What are you building?{" "}
+                    <span className="font-normal text-ink-faint">— tap one</span>
+                  </legend>
+                  <div className="flex flex-wrap gap-2">
+                    {KINDS.map((k) => (
+                      <button
+                        type="button"
+                        key={k}
+                        onClick={() => setKind(k === kind ? "" : k)}
+                        aria-pressed={kind === k}
+                        className={`rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                          kind === k
+                            ? "border-teal bg-teal text-[#103330]"
+                            : "border-hairline-2 text-ink-dim hover:border-teal/60 hover:text-ink"
+                        }`}
+                      >
+                        {k}
+                      </button>
+                    ))}
+                  </div>
+                  <input type="hidden" name="about" value={about} />
                   <textarea
-                    id="f-about"
-                    name="about"
-                    rows={3}
-                    required
-                    placeholder={c.fields.about.label}
-                    className={`${inputCls} resize-none`}
-                    aria-invalid={!!state.fieldErrors?.about}
+                    rows={2}
+                    value={detail}
+                    onChange={(e) => setDetail(e.target.value)}
+                    placeholder="Add a detail or two (optional) — e.g. “Fitness coach, 5k on Instagram, want my own app.”"
+                    className="mt-3 w-full resize-none rounded-xl border border-hairline-2 bg-surface px-3.5 py-3 text-[15px] text-ink caret-teal-hi transition-[border-color,box-shadow] placeholder:text-ink-faint focus:border-teal focus:shadow-[0_0_0_3px_rgba(72,166,167,0.15)] focus:outline-none"
                   />
-                  <label htmlFor="f-about" className={labelCls}>
-                    {c.fields.about.label}
-                  </label>
                   <FieldError msg={state.fieldErrors?.about} />
-                </div>
+                </fieldset>
 
                 <button type="submit" className="btn-teal btn-sheen w-full" disabled={pending}>
                   {pending ? "Sending…" : c.submit}

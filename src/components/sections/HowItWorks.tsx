@@ -1,6 +1,8 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import MaskReveal from "@/components/fx/MaskReveal";
 import Reveal from "@/components/fx/Reveal";
 import { copy } from "@/lib/copy";
 
@@ -47,16 +49,14 @@ export default function HowItWorks() {
         <Reveal as="p" className="eyebrow">
           {c.eyebrow}
         </Reveal>
-        <Reveal delay={0.08}>
-          <h2 id="how-heading" className="text-section mt-4 max-w-[20ch]">
-            {c.heading}
-          </h2>
-        </Reveal>
+        <MaskReveal as="h2" id="how-heading" className="text-section mt-4 max-w-[20ch]">
+          {c.heading}
+        </MaskReveal>
 
         <ol className="mt-14 grid list-none gap-5 p-0 md:grid-cols-3">
           {c.steps.map((s, i) => (
             <Reveal as="li" key={s.title} delay={i * 0.08}>
-              <div className="raised h-full px-8 py-9 transition-all duration-200 ease-out hover:-translate-y-0.5 hover:border-white/[0.14] hover:shadow-[var(--shadow-raise-lg)]">
+              <div className="raised flex h-full flex-col justify-center px-7 py-8 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/[0.14] hover:shadow-[var(--shadow-raise-lg)]">
                 <span
                   className={`inline-flex h-[38px] w-[38px] items-center justify-center rounded-xl text-[15px] font-bold transition-colors duration-500 ${
                     lit
@@ -67,12 +67,23 @@ export default function HowItWorks() {
                 >
                   {i + 1}
                 </span>
-                <h3 className="mt-6 text-[19px] font-bold tracking-tight">{s.title}</h3>
+                <h3 className="mt-5 text-[19px] font-bold tracking-tight">{s.title}</h3>
                 <p className="mt-2.5 text-[15.5px] leading-relaxed text-ink-dim">{s.body}</p>
               </div>
             </Reveal>
           ))}
         </ol>
+
+        {/* convert curiosity-about-effort into the first low-friction step (P0) */}
+        <Reveal delay={0.2} className="mt-12 flex flex-wrap items-center gap-x-4 gap-y-2">
+          <a href="#contact" className="btn-teal btn-sheen">
+            Start your brief
+            <ArrowRight size={17} className="arrow" aria-hidden="true" />
+          </a>
+          <span className="text-[13.5px] text-ink-dim">
+            Step one is a few sentences. That&apos;s it.
+          </span>
+        </Reveal>
       </div>
     </section>
   );

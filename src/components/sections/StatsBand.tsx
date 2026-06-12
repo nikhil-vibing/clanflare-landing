@@ -12,7 +12,7 @@ export default function StatsBand() {
     <section
       id="stats"
       aria-label="Results"
-      className="holo-band border-y border-hairline-2 bg-[#0A0C0B] py-20 md:py-24"
+      className="anchor-band holo-band border-y border-hairline-2 py-20 md:py-24"
     >
       <div className="relative mx-auto max-w-[1180px] px-6 md:px-10">
         <div className="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-4 lg:gap-0">
@@ -26,7 +26,7 @@ export default function StatsBand() {
               }
             >
               <div className="relative px-7 text-center">
-                <div className="inline-flex items-baseline bg-[linear-gradient(180deg,#FFFFFF_0%,#D6E4E3_30%,#8FB8B7_55%,#FFFFFF_78%,#A9C7C6_100%)] bg-clip-text text-[clamp(54px,7vw,92px)] font-black leading-none tracking-[-0.04em] text-transparent">
+                <div className="font-display inline-flex items-baseline bg-[linear-gradient(180deg,#FFFFFF_0%,#EAF1EE_55%,#C8A86B_125%)] bg-clip-text text-[clamp(54px,7vw,92px)] font-black leading-none tracking-normal text-transparent">
                   {"prefix" in s && s.prefix && (
                     <span className="text-[0.5em] font-extrabold">{s.prefix}</span>
                   )}

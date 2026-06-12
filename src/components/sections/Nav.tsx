@@ -20,7 +20,7 @@ export default function Nav() {
     <header
       className={`fixed inset-x-0 top-0 z-[90] border-b pt-[env(safe-area-inset-top)] transition-colors duration-300 ${
         scrolled
-          ? "border-hairline-2 bg-base/70 backdrop-blur-xl"
+          ? "border-white/60 bg-surface/70 shadow-[0_8px_28px_rgba(40,67,63,0.08)] backdrop-blur-xl"
           : "border-transparent"
       }`}
     >

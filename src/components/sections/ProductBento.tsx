@@ -8,6 +8,7 @@ import {
   Trophy,
   type LucideIcon,
 } from "lucide-react";
+import MaskReveal from "@/components/fx/MaskReveal";
 import { LoopMock, type SceneVariant } from "@/components/fx/mocks";
 import Reveal from "@/components/fx/Reveal";
 import TiltSpotlight from "@/components/fx/TiltSpotlight";
@@ -64,11 +65,9 @@ export default function ProductBento() {
         <Reveal as="p" className="eyebrow">
           {c.eyebrow}
         </Reveal>
-        <Reveal delay={0.08}>
-          <h2 id="product-heading" className="text-section mt-4 max-w-[20ch]">
-            {c.heading}
-          </h2>
-        </Reveal>
+        <MaskReveal as="h2" id="product-heading" className="text-section mt-4 max-w-[20ch]">
+          {c.heading}
+        </MaskReveal>
         <Reveal as="p" delay={0.16} className="mt-4 max-w-[30ch] text-[clamp(20px,2.3vw,27px)] font-semibold leading-snug tracking-tight">
           One product replaces the nine tools you&apos;re duct-taping together —{" "}
           <span className="font-medium text-ink-dim">on your brand, on web and mobile.</span>
@@ -86,7 +85,6 @@ export default function ProductBento() {
             return (
               <Reveal key={key} delay={(i % 2) * 0.08} className={m.span}>
                 <TiltSpotlight
-                  tabIndex={0}
                   tilt={m.tilt ?? 0}
                   className={`raised group relative flex h-full p-6 transition-[transform,border-color,background,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:border-white/[0.14] hover:bg-card-hover hover:shadow-[var(--shadow-raise-lg),0_30px_60px_-30px_rgba(72,166,167,0.3)] focus-visible:-translate-y-0.5 focus-visible:border-white/[0.14] focus-visible:bg-card-hover ${
                     isMobile ? "flex-col gap-5 lg:flex-row lg:items-center" : "flex-col"
@@ -107,7 +105,7 @@ export default function ProductBento() {
                     </p>
                   </div>
                   <div
-                    className={`glass-sheen mt-4 overflow-hidden rounded-xl border border-hairline bg-[rgba(8,10,9,0.5)] opacity-90 transition-opacity duration-300 group-hover:opacity-100 ${
+                    className={`glass-sheen mt-4 overflow-hidden rounded-xl border border-hairline bg-surface-alt opacity-90 transition-opacity duration-300 group-hover:opacity-100 ${
                       isMobile
                         ? "flex w-full items-center justify-center lg:mt-0 lg:w-[280px] lg:shrink-0"
                         : "min-h-[150px] flex-1"

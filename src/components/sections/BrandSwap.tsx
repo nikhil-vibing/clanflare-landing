@@ -80,7 +80,7 @@ export default function BrandSwap({ skins }: { skins: Skin[] }) {
       <div className="mx-auto mt-9 max-w-[920px]">
         <div className="glass-device overflow-hidden rounded-2xl shadow-[var(--shadow-stage),0_60px_120px_-40px_rgba(72,166,167,0.24)]">
           <div
-            className="flex h-11 items-center gap-2 border-b border-hairline bg-[rgba(8,10,9,0.4)] px-4"
+            className="flex h-11 items-center gap-2 border-b border-hairline bg-white/45 px-4"
             aria-hidden="true"
           >
             <span className="h-2.5 w-2.5 rounded-full bg-hairline-2" />

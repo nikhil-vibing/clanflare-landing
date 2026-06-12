@@ -8,9 +8,13 @@
 export default function ShaderBg() {
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-      <div className="absolute inset-0 bg-[radial-gradient(70%_48%_at_50%_18%,rgba(95,201,202,0.16),transparent_68%),radial-gradient(42%_38%_at_76%_35%,rgba(132,118,255,0.08),transparent_72%),linear-gradient(180deg,rgba(255,255,255,0.035),transparent_38%)]" />
-      <div className="absolute left-1/2 top-[18%] h-[34rem] w-[58rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(95,201,202,0.12),rgba(72,166,167,0.04)_54%,transparent)] blur-2xl" />
-      <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(255,255,255,0.26),transparent)]" />
+      {/* v19: richer pastel mesh — more sage-teal + dusty-blue presence so the
+          hero is warm, not washed, and reads as kin to the deep-teal bands. */}
+      <div className="absolute inset-0 bg-[radial-gradient(52%_46%_at_15%_8%,rgba(127,168,163,0.50),transparent_56%),radial-gradient(54%_48%_at_87%_14%,rgba(243,236,221,0.62),transparent_60%),radial-gradient(46%_44%_at_66%_92%,rgba(127,168,163,0.28),transparent_58%),linear-gradient(180deg,rgba(255,253,247,0.28),transparent_40%)]" />
+      <div className="absolute left-[42%] top-[12%] h-[34rem] w-[60rem] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(127,168,163,0.36),rgba(220,232,229,0.14)_56%,transparent)] blur-2xl" />
+      {/* soft hand-off into the deep-teal Gather band below */}
+      <div className="absolute inset-x-0 bottom-0 h-44 bg-[linear-gradient(180deg,transparent,rgba(40,67,63,0.07))]" />
+      <div className="absolute inset-x-0 top-0 h-px bg-[linear-gradient(90deg,transparent,rgba(40,67,63,0.18),transparent)]" />
     </div>
   );
 }

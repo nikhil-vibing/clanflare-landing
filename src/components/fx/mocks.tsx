@@ -635,8 +635,8 @@ export function LoopMock({
 }) {
   if (variant === "mobile") {
     return (
-      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(70%_80%_at_50%_30%,rgba(72,166,167,0.14),transparent_70%)] p-3">
-        <div className="glass-device flex max-h-full w-[58%] max-w-[150px] flex-col rounded-xl p-2">
+      <div className="flex h-full w-full items-center justify-center bg-[radial-gradient(70%_80%_at_50%_35%,rgba(72,166,167,0.16),transparent_72%)] p-2">
+        <div className="glass-device flex max-h-full w-[78%] max-w-[224px] flex-col rounded-xl p-1.5">
           <PhoneMock screenshot={screenshot} />
         </div>
       </div>

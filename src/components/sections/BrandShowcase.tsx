@@ -1,3 +1,5 @@
+import MaskReveal from "@/components/fx/MaskReveal";
+import Parallax from "@/components/fx/Parallax";
 import Reveal from "@/components/fx/Reveal";
 import { copy } from "@/lib/copy";
 import { getScreenshots, type ScreenshotKey } from "@/lib/screenshots";
@@ -35,11 +37,9 @@ export default function BrandShowcase() {
           <Reveal as="p" className="eyebrow">
             {c.eyebrow}
           </Reveal>
-          <Reveal delay={0.08}>
-            <h2 id="brand-heading" className="text-section mt-4">
-              {c.heading}
-            </h2>
-          </Reveal>
+          <MaskReveal as="h2" id="brand-heading" className="text-section mt-4">
+            {c.heading}
+          </MaskReveal>
           <Reveal as="p" delay={0.16} className="mx-auto mt-5 max-w-[54ch] text-[19px] leading-relaxed text-ink-dim">
             {c.body}
           </Reveal>
@@ -49,7 +49,9 @@ export default function BrandShowcase() {
         </div>
 
         <Reveal delay={0.1}>
-          <BrandSwap skins={skins} />
+          <Parallax amount={6}>
+            <BrandSwap skins={skins} />
+          </Parallax>
         </Reveal>
 
         <Reveal as="p" delay={0.1} className="mt-10 text-center text-lg font-medium text-ink-dim">

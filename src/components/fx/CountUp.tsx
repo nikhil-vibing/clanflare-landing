@@ -37,6 +37,12 @@ export default function CountUp({
     ) {
       return; // keep the static real value
     }
+    // If the number is already in (or above) the viewport on mount — e.g. the
+    // visitor landed mid-page or deep-linked here — keep the real value. A
+    // count-up only reads right when you watch it enter; otherwise it flashes 0.
+    if (el.getBoundingClientRect().top < window.innerHeight) {
+      return;
+    }
     let raf = 0;
     const io = new IntersectionObserver(
       (ents) => {

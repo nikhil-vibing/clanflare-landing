@@ -1,15 +1,34 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import CursorFlag from "@/components/fx/CursorFlag";
 import Grain from "@/components/fx/Grain";
+import MobileCta from "@/components/sections/MobileCta";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import { copy } from "@/lib/copy";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+// v19 type system — the modern premium Fontshare pairing (self-hosted):
+// Satoshi (body) + Clash Display (headlines). Confident, contemporary, warm —
+// matches the "gather the clan / own your world" vibe, no serif, no Inter.
+const satoshi = localFont({
+  src: [
+    { path: "./fonts/satoshi-400.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/satoshi-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/satoshi-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-satoshi",
+  display: "swap",
+});
+
+const clash = localFont({
+  src: [
+    { path: "./fonts/clash-display-500.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/clash-display-600.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/clash-display-700.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-clash",
   display: "swap",
 });
 
@@ -27,8 +46,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  colorScheme: "dark",
-  themeColor: "#0c0e0d",
+  colorScheme: "light",
+  themeColor: "#F4F1EB",
 };
 
 const orgJsonLd = {
@@ -46,13 +65,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${satoshi.variable} ${clash.variable}`}>
       <body>
         <a href="#main" className="skip-link">
           Skip to content
         </a>
         <SmoothScroll>{children}</SmoothScroll>
         <Grain />
+        <CursorFlag />
+        <MobileCta />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgJsonLd) }}

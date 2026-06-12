@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useRef } from "react";
 import GlowBg from "@/components/fx/GlowBg";
 import { copy } from "@/lib/copy";
@@ -20,11 +21,16 @@ export default function Vision() {
         const el = ref.current;
         if (!el) return;
         const targets = el.querySelectorAll<HTMLElement>("[data-scrub]");
+        const splits: SplitText[] = [];
         document.fonts.ready.then(() => {
           if (!ref.current) return;
           const words: Element[] = [];
           targets.forEach((t) => {
-            const split = SplitText.create(t, { type: "words" });
+            // aria:"none" — don't let SplitText add aria-label to a generic
+            // <span> (prohibited-attr a11y violation); the word divs stay
+            // readable text for screen readers.
+            const split = SplitText.create(t, { type: "words", aria: "none" });
+            splits.push(split);
             words.push(...split.words);
           });
           const final = el.querySelector("[data-final]");
@@ -42,6 +48,10 @@ export default function Vision() {
             },
           });
         });
+        // Revert the SplitText DOM wrapping on cleanup (HMR / resize re-split /
+        // unmount) so word spans never leak. The ScrollTrigger + tween are
+        // killed by the matchMedia/useGSAP context teardown.
+        return () => splits.forEach((s) => s.revert());
       });
     },
     { scope: ref }
@@ -52,7 +62,7 @@ export default function Vision() {
       ref={ref}
       id="vision"
       aria-labelledby="vision-heading"
-      className="band relative overflow-hidden py-32 text-center md:py-[210px]"
+      className="anchor-band band relative overflow-hidden py-24 text-center md:py-[150px]"
     >
       <h2 id="vision-heading" className="sr-only">
         Our vision
@@ -73,6 +83,16 @@ export default function Vision() {
           >
             {copy.vision.final}
           </span>
+        </p>
+        {/* resolve the crescendo into an action (behavioral audit P2) */}
+        <p className="mt-12">
+          <a
+            href="#contact"
+            className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-6 py-3 text-[15px] font-semibold text-ink backdrop-blur-sm transition-colors hover:bg-white/[0.18]"
+          >
+            Make it yours
+            <ArrowRight size={16} aria-hidden="true" />
+          </a>
         </p>
       </div>
     </section>
